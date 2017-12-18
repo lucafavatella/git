@@ -279,6 +279,38 @@ test_expect_success 'test when words are only removed at the end' '
 	word_diff --color-words=.
 '
 
+test_expect_success 'test when words removed at beginning of consecutive lines' '
+     printf "%b\n%b\n%b\n" "#foo" "#bar" "baz" >pre &&
+     printf "%b\n%b\n%b\n" "foo" "bar" "baz" >post &&
+     cat >expect <<-\EOF &&
+             <BOLD>diff --git a/pre b/post<RESET>
+             <BOLD>index 289cb9d..2d06f37 100644<RESET>
+             <BOLD>--- a/pre<RESET>
+             <BOLD>+++ b/post<RESET>
+             <CYAN>@@ -1 +1 @@<RESET>
+             <RED>#<RESET>foo
+             <RED>#<RESET>bar
+             baz
+     EOF
+     word_diff --color-words=.
+'
+
+test_expect_success 'test when words added at beginning of consecutive lines' '
+     printf "%b\n%b\n%b\n" "foo" "bar" "baz" >pre &&
+     printf "%b\n%b\n%b\n" "#foo" "#bar" "baz" >post &&
+     cat >expect <<-\EOF &&
+             <BOLD>diff --git a/pre b/post<RESET>
+             <BOLD>index 289cb9d..2d06f37 100644<RESET>
+             <BOLD>--- a/pre<RESET>
+             <BOLD>+++ b/post<RESET>
+             <CYAN>@@ -1 +1 @@<RESET>
+             <GREEN>#<RESET>foo
+             <GREEN>#<RESET>bar
+             baz
+     EOF
+     word_diff --color-words=.
+'
+
 test_expect_success '--word-diff=none' '
 	echo "(:" >pre &&
 	echo "(" >post &&
